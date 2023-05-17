@@ -25,6 +25,7 @@ function addInputSet() {
       <option value="R&B">R&B (Rhythm and Blues)</option>
       <option value="Reggae">Reggae</option>
       <option value="Rock">Rock</option>
+      <option value="Ska">Ska</option>
       <option value="Soul">Soul</option>
       <option value="Other">Other</option>
     </select>
