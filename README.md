@@ -1,7 +1,5 @@
 # Playlist Analyzer
 
-![Playlist Analyzer]
-
 This program is a basic playlist analyzer that allows users to enter a playlist name along with individual song details such as name, duration, and genre. It analyzes the playlist and provides insightful information about the songs.
 
 ## Features
