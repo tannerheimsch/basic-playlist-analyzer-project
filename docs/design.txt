@@ -1,0 +1,275 @@
+PROBLEM STATEMENT:
+	Design a program that provides song analysis functionality for users. The program will be hosted on a website and allow 
+	users to enter their playlist details, including the playlist name, song names, song durations, and genres. Users can add 
+	multiple songs by dynamically adding input fields via a button. Once the user has entered all the required information, 
+	they can trigger the analysis process by clicking a button. This will then output the total playlist duration, determine 
+	the shortest song and longest songs, and determine the most popular genre across all songs. The program will also
+	warn the user if they haven't entered a playlist name or missed any song information in the input fields
+	
+NOUNS: song analysis, website, playlist name, song names, song durations, genres, input fields, button, analysis process, 
+					output, shortest song, longest song, most popular genre, any song information
+
+VERBS: hosted, enter, dynamically adding, clicking, determine, trigger, warn, missed
+
+
+DEFINING DIAGRAM
+	INPUTS:
+		playlistName
+		songName
+		songDuration
+		songGenre
+
+	PROCESSING
+		warn user if they have missed anything in the input fields
+		listen for form submission from website if there are no missing fields
+		push input variables into respective empty arrays using a loop
+		send songName array, songDuration array, and songGenre array to calculation functions
+		calculate total playlist duration using a loop that converts it to MM:SS and adds the values
+		return totalPlaylistDuration using padZero function to output properly
+		determine shortest and longest durations as well as their genres using a loop that splits the values and compares them, updating the variables based off comparison
+		return shortestSongName, longestSongName, shortestSong Genre, longestSongGenre, and formattedShortestSongDuration/formattedLongestSongDuration using padZero function to output properly
+		determine most popular genre by using a loop that counts the occurence of each genre in the songGenre object and compares the values in the songGenreList array
+		display playlist name
+		display playlist duration
+		display shortest song and genre
+		display longest song and genre
+		display most common genre
+		alert user playlist has been analyzed
+	
+	OUTPUTS:
+		playlistName
+		formattedTotalDuration
+		shortestSongName + formattedShortestSongDuration
+		longestSongName + formattedLongestSongDuration
+		mostCommonGenre
+		
+		
+SOLUTION ALGORITHM
+
+CalculateTotalDuration USING songDurationList
+  Initialize totalDuration to 0
+  FOR each songDuration in songDurationList
+    SET durationParts to split songDuration using ":" as the separator
+    SET minutes to parse the first element of durationParts as an integer
+    SET seconds to parse the second element of durationParts as an integer
+    SET totalDuration to totalDuration + (minutes * 60) + seconds
+  ENDFOR
+  SET totalMinutes to floor(totalDuration / 60)
+  SET totalSeconds to totalDuration modulo 60
+  RETURN formatted duration in the format "MM:SS" by calling the padZero function on totalMinutes and appending ":" and padZero(totalSeconds).
+END
+
+FindSongDurations USING songDurationList, songNameList, songGenreList
+  Initialize shortestDuration to Number.MAX_VALUE
+  Initialize shortestSongIndex to -1
+  Initialize longestDuration to 0
+  Initialize longestSongIndex to -1
+
+  FOR each songDuration in songDurationList
+    SET durationParts to split songDuration using ":" as the separator
+    SET minutes to parse the first element of durationParts as an integer
+    SET seconds to parse the second element of durationParts as an integer
+    SET songDurationInSeconds to minutes * 60 + seconds
+
+    IF songDurationInSeconds < shortestDuration THEN
+      SET shortestDuration to songDurationInSeconds
+      SET shortestSongIndex to current index
+    ENDIF
+    IF songDurationInSeconds > longestDuration THEN
+      SET longestDuration to songDurationInSeconds
+      SET longestSongIndex to current index
+    ENDIF
+  ENDFOR
+
+  SET shortestSongName to songNameList[shortestSongIndex]
+  SET shortestSongMinutes to floor(shortestDuration / 60)
+  SET shortestSongSeconds to shortestDuration modulo 60
+  SET shortestSongGenre to songGenreList[shortestSongIndex]
+  SET longestSongName to songNameList[longestSongIndex]
+  SET longestSongMinutes to floor(longestDuration / 60)
+  SET longestSongSeconds to longestDuration modulo 60
+  SET longestSongGenre to songGenreList[longestSongIndex]
+
+  RETURN an object with the following:
+    - shortestSongName: shortestSongName
+    - formattedShortestSongDuration: call padZero function shortestSongMinutes + ":" + call PadZero function shortestSongSeconds
+    - shortestSongGenre: shortestSongGenre
+    - longestSongName: longestSongName
+    - formattedLongestSongDuration:  call padZero function longestSongMinutes  + ":" +  call PadZero function longestSongSeconds
+    - longestSongGenre: longestSongGenre
+END
+
+FindMostCommonGenre USING songGenreList
+  Initialize genreCount to {}
+  Initialize mostCommonGenre to ""
+  Initialize maxCount to 0
+
+  FOR each genre in songGenreList
+    IF genre exists in genreCount THEN
+      Increment genreCount[genre] by 1
+    ELSE
+      Set genreCount[genre] to 1
+    ENDIF
+  ENDFOR
+
+  FOR each genre in genreCount
+    IF genreCount[genre] is greater than maxCount THEN
+      Set mostCommonGenre to genre
+      Set maxCount to genreCount[genre]
+    ENDIF
+  ENDFOR
+
+  RETURN mostCommonGenre
+END
+
+PadZero USING number
+  IF number is less than 10 THEN
+    RETURN "0" concatenated with number
+  ELSE
+    RETURN number as a string
+  ENDIF
+END
+
+AnalyzerResults
+  SET analyzerForm to get playlist_analyzer element from HTML 
+
+  analyzerForm.addEventListener("submit", FUNCTION(event)
+    event.preventDefault()
+    SET playlistName to document.getElementById("playlistName")
+    SET songName to document.getElementsByClassName("songName")
+    SET songDuration to document.getElementsByClassName("songDuration")
+    SET songGenre to document.getElementsByClassName("songGenre")
+    SET emptyFieldFound to false
+
+    IF playlistName.value is an empty string THEN
+      alert "Please enter a playlist name."
+    ELSE
+      FOR each element in songName
+        IF songName[i].value is an empty string OR songDuration[i].value is an empty string OR songGenre[i].value is an empty string
+          SET emptyFieldFound to true
+          BREAK
+        ENDIF
+      ENDFOR
+
+      IF emptyFieldFound is true THEN
+        alert "Please enter all song details."
+      ELSE
+        SET songNameList to an empty array
+        SET songDurationList to an empty array
+        SET songGenreList to an empty array
+
+        FOR each element in songName
+          SET name to songName[i].value
+          SET duration to songDuration[i].value
+          SET genre to songGenre[i].value
+
+          push name to songNameList
+          push duration to songDurationList
+          push genre to songGenreList
+        ENDFOR
+
+        SET formattedTotalDuration to calculateTotalDuration(songDurationList)
+        SET songInfo to findSongDurations(songDurationList, songNameList, songGenreList)
+        SET mostCommonGenre to findMostCommonGenre(songGenreList)
+        SET outputMessage to "<b>Playlist Name:</b> " + playlistName.value + "<br>" + 
+                           "<b>Playlist Duration:</b> " + formattedTotalDuration + "<br>" + 
+                           "<b>Shortest Song:</b> " + songInfo.shortestSongName + " (" + songInfo.formattedShortestSongDuration + ") - <i>" + songInfo.shortestSongGenre + "</i> <br>" + 
+                           "<b>Longest Song:</b> " + songInfo.longestSongName + " (" + songInfo.formattedLongestSongDuration + ") - <i>" + songInfo.longestSongGenre + "</i> <br>" + 
+                           "<b>Most Common Genre:</b> " + mostCommonGenre
+        alert "Playlist analyzed. You have great taste!"
+        SET outputArea to document.getElementById("output")
+        SET outputArea.innerHTML to outputMessage
+      ENDIF
+    ENDIF
+  END
+END
+CALL AnalyzerResults
+
+TEST PLANS
+
+VARIABLES: playlistName, songName, songDuration, songGenre[SELECTION]
+
+TEST CASE 1:
+
+  INPUT VALUES: Best of Rock
+    Granite, 3:45, [Rock]
+    Basalt, 3:54, [Rock]
+    Pumice, 2:10, [Hip Hop]
+
+  EXPECTED RESULT:
+    Playlist Name: Best of Rock
+    Playlist Duration: 09:40
+    Shortest Song: Pumice (2:10) - Hip Hop
+    Longest Song: Basalt (3:54) - Rock
+    Most Common Genre: Rock
+
+  ACTUAL RESULT:
+    Playlist Name: Best of Rock
+    Playlist Duration: 09:40
+    Shortest Song: Pumice (2:10) - Hip Hop
+    Longest Song: Basalt (3:54) - Rock
+    Most Common Genre: Rock
+
+TEST CASE 2:
+
+  INPUT VALUES: Totally Not Jazz
+    Saxophone, 6:25, [Jazz]
+    Trumpet, 7:01, [Electronic]
+    Cello, 1:40, [Electronic]
+
+  EXPECTED RESULT:
+    Playlist Name: Totally Not Jazz
+    Playlist Duration: 15:06
+    Shortest Song: Cello (1:40) - Electronic
+    Longest Song: Trumpet (7:01) - Electronic
+    Most Common Genre: Electronic
+
+  ACTUAL RESULT:
+    Playlist Name: Totally Not Jazz
+    Playlist Duration: 15:06
+    Shortest Song: Cello (1:40) - Electronic
+    Longest Song: Trumpet (7:01) - Electronic
+    Most Common Genre: Electronic
+
+TEST CASE 3:
+  INPUT VALUES: Funky Fusion Fiesta
+    Flute, 2:45, [Jazz]
+    Electric Guitar, 10:20, [Rock]
+    Vibraphone, 3:30, [Jazz]
+    Drum Set, 6:15, [R&B]
+
+  EXPECTED RESULT:
+    Playlist Name: Funky Fusion Fiesta
+    Playlist Duration: 23:50
+    Shortest Song: Flute (2:45) - Jazz
+    Longest Song: Electric Guitar (10:20) - Rock
+    Most Common Genre: Jazz
+
+  ACTUAL RESULT:
+    Playlist Name: Funky Fusion Fiesta
+    Playlist Duration: 23:50
+    Shortest Song: Flute (2:45) - Jazz
+    Longest Song: Electric Guitar (10:20) - Rock
+    Most Common Genre: Jazz
+
+TEST CASE 4:
+  INPUT VALUES: Electronic Extravaganza
+    Saxophone, 7:55, [Electronic]
+    Bass Guitar, 4:10, [Funk]
+    Drum Set, 6:30, [Electronic]
+    Trombone, 5:40, [Electronic]
+    Electric Keyboard, 3:20, [Funk]
+
+  EXPECTED RESULT:
+    Playlist Name: Electronic Extravaganza
+    Playlist Duration: 27:35
+    Shortest Song: Electric Keyboard (3:20) - Funk
+    Longest Song: Saxophone (7:55) - Electronic
+    Most Common Genre: Electronic
+
+  ACTUAL RESULT:
+    Playlist Name: Electronic Extravaganza
+    Playlist Duration: 27:35
+    Shortest Song: Electric Keyboard (3:20) - Funk
+    Longest Song: Saxophone (7:55) - Electronic
+    Most Common Genre: Electronic
