@@ -1,19 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My HTML Site</title>
+  <title>Playlist Analyzer</title>
   <link rel="stylesheet" href="resources/css/style.css" media="screen">
 </head>
 <body>
   <header>
-    <h1>Welcome to My HTML Site</h1>
+    <h1>PLAYLIST ANALYZER</h1>
   </header>
-  
   <main>
-    <p>This is a basic HTML site.</p>
+    <p id="description">A basic playlist analyzer that allows a user to enter pertinent song information and then analyzes it to show <b>total playlist duration</b>, <b>shortest</b> and <b>longest song durations</b>, as well as the <b>most common genre</b>.</p>
+    <br>
+    <!-- <p id="description2">Type or select the information for your playlist, to add a song click "Add Song", when you are finished click "Analyze Playlist"</p> -->
+    <form id="playlist_analyzer" onsubmit="event.preventDefault();">
+
+      <div id="input_set">
+        <div class="song-input">
+          <label for="playlistName"><b>Playlist Name:</b></label>
+          <br>
+          <input id="playlistName" type="text" />
+          <br>
+          <br>
+          <label for="songName">Song Name:</label>
+          <input class="songName" type="text" />
+
+          <label for="songDuration">Duration <small>(MM:SS)</small>:</label>
+          <input class="songDuration" type="text" />
+
+          <!-- Song genre selection -->
+          <label for="songGenre">Genre:</label>
+          <select class="songGenre">
+            <option value="">- Select Genre -</option>
+            <option value="Blues">Blues</option>
+            <option value="Country">Country</option>
+            <option value="Electronic">Electronic</option>
+            <option value="Hip Hop">Hip Hop</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Metal">Metal</option>
+            <option value="Pop">Pop</option>
+            <option value="R&B">R&B (Rhythm and Blues)</option>
+            <option value="Reggae">Reggae</option>
+            <option value="Rock">Rock</option>
+            <option value="Soul">Soul</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <br>
+      <br>
+        <!-- Button to prompt user to add another song -->
+        <button class="custom-button" type="button" onclick="addInputSet()">Add Song</button>
+        <!-- Button for user to submit song information -->
+        <input class="custom-button" type="submit" value="Analyze Playlist" />
+    </form>
+    <br>
+    <p id="output"></p>
   </main>
-  
-  <script>
-  </script>
+  <script src="js/playlistAnalyzer.js"></script>
+  <script src="js/addSong.js"></script>
 </body>
 </html>
